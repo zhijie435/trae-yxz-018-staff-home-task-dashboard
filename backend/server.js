@@ -59,12 +59,19 @@ initialEmployees.forEach(emp => {
 
 const employeeData = employees[0];
 
-const dashboardData = {
-  todayTasks: 5,
-  pendingDelivery: 12,
-  inRent: 38,
-  pendingAcceptance: 7,
-  pendingRepair: 3
+const getDashboardData = () => {
+  const pendingDelivery = 12;
+  const inRent = 38;
+  const pendingAcceptance = 7;
+  const pendingRepair = 3;
+  const todayTasks = pendingDelivery + inRent + pendingAcceptance + pendingRepair;
+  return {
+    todayTasks,
+    pendingDelivery,
+    inRent,
+    pendingAcceptance,
+    pendingRepair
+  };
 };
 
 const latestTasks = [
@@ -124,7 +131,7 @@ app.get('/api/dashboard/stats', (req, res) => {
   res.json({
     code: 0,
     message: 'success',
-    data: dashboardData
+    data: getDashboardData()
   });
 });
 

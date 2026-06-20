@@ -253,7 +253,7 @@ const newTaskCount = computed(() => {
 });
 
 const shortcutCounts = computed(() => ({
-  all: (stats.value.pendingDelivery || 0) + (stats.value.inRent || 0) + (stats.value.pendingAcceptance || 0) + (stats.value.pendingRepair || 0),
+  all: stats.value.todayTasks || 0,
   pendingDelivery: stats.value.pendingDelivery || 0,
   inRent: stats.value.inRent || 0,
   pendingAcceptance: stats.value.pendingAcceptance || 0,
