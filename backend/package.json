@@ -2,13 +2,19 @@
   "name": "employee-dashboard-backend",
   "version": "1.0.0",
   "description": "员工端首页任务看板后端服务",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.1"
   }
 }

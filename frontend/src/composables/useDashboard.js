@@ -83,9 +83,11 @@ export function useDashboard(emit) {
     }
   };
 
-  const refreshDashboard = () => {
-    fetchDashboardStats();
-    fetchLatestTasks();
+  const refreshDashboard = async () => {
+    await Promise.all([
+      fetchDashboardStats(),
+      fetchLatestTasks()
+    ]);
   };
 
   onMounted(() => {

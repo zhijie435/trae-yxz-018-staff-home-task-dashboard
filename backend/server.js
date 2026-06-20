@@ -1,5 +1,7 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 const app = express();
 const PORT = 8888;
@@ -10,6 +12,10 @@ app.use(express.json());
 const EMPLOYEE_ID_PREFIX = 'CGRE';
 const EMPLOYEE_ID_DIGITS = 5;
 let employeeIdCounter = 1;
+
+const resetEmployeeIdCounter = (value = 1) => {
+  employeeIdCounter = value;
+};
 
 const generateEmployeeId = () => {
   const numStr = String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0');
@@ -30,9 +36,11 @@ const calculateLevel = (deliveryCount) => {
   }
 };
 
-const createEmployee = (name, city, avatar = '') => {
-  const id = generateEmployeeId();
-  const deliveryCount = Math.floor(Math.random() * 120) + 5;
+const createEmployee = (name, city, avatar = '', options = {}) => {
+  const id = options.id || generateEmployeeId();
+  const deliveryCount = options.deliveryCount !== undefined
+    ? options.deliveryCount
+    : Math.floor(Math.random() * 120) + 5;
   const level = calculateLevel(deliveryCount);
   return {
     id,
@@ -41,7 +49,7 @@ const createEmployee = (name, city, avatar = '') => {
     city,
     deliveryCount,
     level,
-    joinDate: new Date().toISOString().split('T')[0]
+    joinDate: options.joinDate || new Date().toISOString().split('T')[0]
   };
 };
 
@@ -59,11 +67,11 @@ initialEmployees.forEach(emp => {
 
 const employeeData = employees[0];
 
-const getDashboardData = () => {
-  const pendingDelivery = 12;
-  const inRent = 38;
-  const pendingAcceptance = 7;
-  const pendingRepair = 3;
+const getDashboardData = (overrides = {}) => {
+  const pendingDelivery = overrides.pendingDelivery ?? 12;
+  const inRent = overrides.inRent ?? 38;
+  const pendingAcceptance = overrides.pendingAcceptance ?? 7;
+  const pendingRepair = overrides.pendingRepair ?? 3;
   const todayTasks = pendingDelivery + inRent + pendingAcceptance + pendingRepair;
   return {
     todayTasks,
@@ -74,7 +82,7 @@ const getDashboardData = () => {
   };
 };
 
-const latestTasks = [
+const getLatestTasksDefault = () => [
   {
     id: 'TASK20240620001',
     title: '上海市浦东新区XX小区设备交付',
@@ -118,6 +126,8 @@ const latestTasks = [
     remark: '月度例行维护，请提前联系客户'
   }
 ];
+
+const latestTasks = getLatestTasksDefault();
 
 app.get('/api/employee/info', (req, res) => {
   res.json({
@@ -240,9 +250,26 @@ app.get('/api/employee-id/next', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend server is running on http://localhost:${PORT}`);
-  console.log(`员工编号前缀: ${EMPLOYEE_ID_PREFIX}, 位数: ${EMPLOYEE_ID_DIGITS}`);
-  console.log(`当前下一个编号: ${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`);
-  console.log(`已注册员工数: ${employees.length}`);
-});
+const __filename = fileURLToPath(import.meta.url);
+const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === __filename;
+
+if (isMainModule) {
+  app.listen(PORT, () => {
+    console.log(`Backend server is running on http://localhost:${PORT}`);
+    console.log(`员工编号前缀: ${EMPLOYEE_ID_PREFIX}, 位数: ${EMPLOYEE_ID_DIGITS}`);
+    console.log(`当前下一个编号: ${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`);
+    console.log(`已注册员工数: ${employees.length}`);
+  });
+}
+
+export {
+  app,
+  EMPLOYEE_ID_PREFIX,
+  EMPLOYEE_ID_DIGITS,
+  generateEmployeeId,
+  resetEmployeeIdCounter,
+  calculateLevel,
+  createEmployee,
+  getDashboardData,
+  getLatestTasksDefault
+};
