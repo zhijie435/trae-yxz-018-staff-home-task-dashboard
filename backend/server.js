@@ -20,14 +20,27 @@ const generateEmployeeId = () => {
 
 const employees = [];
 
+const calculateLevel = (deliveryCount) => {
+  if (deliveryCount >= 100) {
+    return { type: 'senior', label: '高级工程师' };
+  } else if (deliveryCount >= 30) {
+    return { type: 'intermediate', label: '中级工程师' };
+  } else {
+    return { type: 'junior', label: '初级工程师' };
+  }
+};
+
 const createEmployee = (name, city, avatar = '') => {
   const id = generateEmployeeId();
+  const deliveryCount = Math.floor(Math.random() * 120) + 5;
+  const level = calculateLevel(deliveryCount);
   return {
     id,
     name,
     avatar: avatar || `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20asian%20${name.includes('女') || name.includes('女') || name.endsWith('华') || name.endsWith('兰') || name.endsWith('芳') || name.endsWith('梅') ? 'female' : 'male'}%20employee%20portrait%20photo%20business%20suit%20friendly%20smile%20studio%20lighting&image_size=square_hd`,
     city,
-    deliveryCount: Math.floor(Math.random() * 80) + 5,
+    deliveryCount,
+    level,
     joinDate: new Date().toISOString().split('T')[0]
   };
 };

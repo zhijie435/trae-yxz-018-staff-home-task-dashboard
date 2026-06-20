@@ -32,6 +32,23 @@
             </svg>
             {{ engineerLevel.label }}
           </span>
+          <span
+            v-if="showLevelUpBadge"
+            class="level-up-badge"
+          >
+            <svg
+              class="level-up-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"
+                fill="currentColor"
+              />
+            </svg>
+            恭喜升级！
+          </span>
         </div>
         <div class="info-row">
           <div class="employee-id-badge">
@@ -84,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 
 const employee = ref({
@@ -92,14 +109,22 @@ const employee = ref({
   name: '',
   avatar: '',
   city: '',
-  deliveryCount: 0
+  deliveryCount: 0,
+  level: null
 });
+
+const previousLevelType = ref(null);
+const showLevelUpBadge = ref(false);
+let levelUpTimer = null;
 
 const initial = computed(() => {
   return employee.value.name ? employee.value.name.charAt(0) : '';
 });
 
 const engineerLevel = computed(() => {
+  if (employee.value.level && employee.value.level.type && employee.value.level.label) {
+    return employee.value.level;
+  }
   const count = employee.value.deliveryCount || 0;
   if (count >= 100) {
     return { type: 'senior', label: '高级工程师' };
@@ -109,6 +134,27 @@ const engineerLevel = computed(() => {
     return { type: 'junior', label: '初级工程师' };
   }
 });
+
+const checkLevelUp = (newLevel, oldLevel) => {
+  const levelOrder = { junior: 1, intermediate: 2, senior: 3 };
+  if (oldLevel && newLevel && levelOrder[newLevel] > levelOrder[oldLevel]) {
+    showLevelUpBadge.value = true;
+    if (levelUpTimer) clearTimeout(levelUpTimer);
+    levelUpTimer = setTimeout(() => {
+      showLevelUpBadge.value = false;
+    }, 5000);
+  }
+};
+
+watch(
+  () => employee.value.level?.type || engineerLevel.value.type,
+  (newType, oldType) => {
+    if (previousLevelType.value && previousLevelType.value !== newType) {
+      checkLevelUp(newType, previousLevelType.value);
+    }
+    previousLevelType.value = newType;
+  }
+);
 
 const fetchEmployeeInfo = async () => {
   try {
@@ -272,6 +318,37 @@ onMounted(() => {
 .delivery-icon {
   width: 16px;
   height: 16px;
+}
+
+.level-up-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  background: linear-gradient(135deg, #ff7a45 0%, #fa541c 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(250, 84, 28, 0.4);
+  animation: levelUpPulse 1.5s ease-in-out infinite;
+}
+
+.level-up-icon {
+  width: 14px;
+  height: 14px;
+}
+
+@keyframes levelUpPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(250, 84, 28, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(250, 84, 28, 0.6);
+  }
 }
 
 @media (max-width: 640px) {
