@@ -1,6 +1,7 @@
 <template>
   <div class="home-page">
     <EmployeeHeader />
+    <DashboardStats />
     <main class="main-content">
       <p class="placeholder">任务看板内容区域</p>
     </main>
@@ -9,6 +10,7 @@
 
 <script setup>
 import EmployeeHeader from './components/EmployeeHeader.vue';
+import DashboardStats from './components/DashboardStats.vue';
 </script>
 
 <style scoped>
