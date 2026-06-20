@@ -101,74 +101,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';
+import { onUnmounted } from 'vue';
+import { useEmployee } from '../composables/useEmployee';
 
-const employee = ref({
-  id: '',
-  name: '',
-  avatar: '',
-  city: '',
-  deliveryCount: 0,
-  level: null
-});
+const {
+  employee,
+  initial,
+  engineerLevel,
+  showLevelUpBadge,
+  cleanup
+} = useEmployee();
 
-const previousLevelType = ref(null);
-const showLevelUpBadge = ref(false);
-let levelUpTimer = null;
-
-const initial = computed(() => {
-  return employee.value.name ? employee.value.name.charAt(0) : '';
-});
-
-const engineerLevel = computed(() => {
-  if (employee.value.level && employee.value.level.type && employee.value.level.label) {
-    return employee.value.level;
-  }
-  const count = employee.value.deliveryCount || 0;
-  if (count >= 100) {
-    return { type: 'senior', label: '高级工程师' };
-  } else if (count >= 30) {
-    return { type: 'intermediate', label: '中级工程师' };
-  } else {
-    return { type: 'junior', label: '初级工程师' };
-  }
-});
-
-const checkLevelUp = (newLevel, oldLevel) => {
-  const levelOrder = { junior: 1, intermediate: 2, senior: 3 };
-  if (oldLevel && newLevel && levelOrder[newLevel] > levelOrder[oldLevel]) {
-    showLevelUpBadge.value = true;
-    if (levelUpTimer) clearTimeout(levelUpTimer);
-    levelUpTimer = setTimeout(() => {
-      showLevelUpBadge.value = false;
-    }, 5000);
-  }
-};
-
-watch(
-  () => employee.value.level?.type || engineerLevel.value.type,
-  (newType, oldType) => {
-    if (previousLevelType.value && previousLevelType.value !== newType) {
-      checkLevelUp(newType, previousLevelType.value);
-    }
-    previousLevelType.value = newType;
-  }
-);
-
-const fetchEmployeeInfo = async () => {
-  try {
-    const response = await axios.get('/api/employee/info');
-    if (response.data.code === 0) {
-      employee.value = response.data.data;
-    }
-  } catch (error) {
-    console.error('获取员工信息失败:', error);
-  }
-};
-
-onMounted(() => {
-  fetchEmployeeInfo();
+onUnmounted(() => {
+  cleanup();
 });
 </script>
 

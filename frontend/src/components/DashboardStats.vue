@@ -11,51 +11,19 @@
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card card-purple">
+        <div
+          v-for="card in statCards"
+          :key="card.type"
+          class="stat-card"
+          :class="'card-' + card.type"
+          @click="handleShortcutClick(card.type)"
+        >
           <div class="stat-icon-wrapper">
-            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/>
-            </svg>
+            <TaskIcon :type="card.type" :size="28" />
           </div>
           <div class="stat-content">
-            <span class="stat-label">待交付</span>
-            <span class="stat-value">{{ stats.pendingDelivery || 0 }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card card-green">
-          <div class="stat-icon-wrapper">
-            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">租赁中</span>
-            <span class="stat-value">{{ stats.inRent || 0 }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card card-orange">
-          <div class="stat-icon-wrapper">
-            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">待验收</span>
-            <span class="stat-value">{{ stats.pendingAcceptance || 0 }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card card-red">
-          <div class="stat-icon-wrapper">
-            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">待报修处理</span>
-            <span class="stat-value">{{ stats.pendingRepair || 0 }}</span>
+            <span class="stat-label">{{ card.label }}</span>
+            <span class="stat-value">{{ stats[card.type] || 0 }}</span>
           </div>
         </div>
       </div>
@@ -65,75 +33,19 @@
           <h3 class="shortcut-title">快捷任务入口</h3>
         </div>
         <div class="shortcut-grid">
-          <div class="shortcut-item shortcut-all" @click="handleShortcutClick('all')">
-            <div class="shortcut-icon-wrapper icon-blue">
-              <svg class="shortcut-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill="currentColor"/>
-              </svg>
+          <div
+            v-for="item in shortcutItems"
+            :key="item.type"
+            class="shortcut-item"
+            :class="'shortcut-' + item.type"
+            @click="handleShortcutClick(item.type)"
+          >
+            <div class="shortcut-icon-wrapper" :class="'icon-' + item.type">
+              <TaskIcon :type="item.type" :size="22" />
             </div>
             <div class="shortcut-info">
-              <span class="shortcut-label">全部任务</span>
-              <span class="shortcut-count">{{ shortcutCounts.all || 0 }} 项</span>
-            </div>
-            <svg class="shortcut-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </div>
-
-          <div class="shortcut-item shortcut-delivery" @click="handleShortcutClick('pendingDelivery')">
-            <div class="shortcut-icon-wrapper icon-purple">
-              <svg class="shortcut-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="shortcut-info">
-              <span class="shortcut-label">待交付</span>
-              <span class="shortcut-count">{{ shortcutCounts.pendingDelivery || 0 }} 项</span>
-            </div>
-            <svg class="shortcut-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </div>
-
-          <div class="shortcut-item shortcut-rent" @click="handleShortcutClick('inRent')">
-            <div class="shortcut-icon-wrapper icon-green">
-              <svg class="shortcut-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="shortcut-info">
-              <span class="shortcut-label">租赁中</span>
-              <span class="shortcut-count">{{ shortcutCounts.inRent || 0 }} 项</span>
-            </div>
-            <svg class="shortcut-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </div>
-
-          <div class="shortcut-item shortcut-acceptance" @click="handleShortcutClick('pendingAcceptance')">
-            <div class="shortcut-icon-wrapper icon-orange">
-              <svg class="shortcut-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="shortcut-info">
-              <span class="shortcut-label">待验收</span>
-              <span class="shortcut-count">{{ shortcutCounts.pendingAcceptance || 0 }} 项</span>
-            </div>
-            <svg class="shortcut-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </div>
-
-          <div class="shortcut-item shortcut-aftersale" @click="handleShortcutClick('afterSale')">
-            <div class="shortcut-icon-wrapper icon-red">
-              <svg class="shortcut-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="shortcut-info">
-              <span class="shortcut-label">售后处理</span>
-              <span class="shortcut-count">{{ shortcutCounts.afterSale || 0 }} 项</span>
+              <span class="shortcut-label">{{ item.label }}</span>
+              <span class="shortcut-count">{{ shortcutCounts[item.type] || 0 }} 项</span>
             </div>
             <svg class="shortcut-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
@@ -167,13 +79,8 @@
           >
             <div class="task-card-header">
               <div class="task-type-tag">
-                <svg class="task-type-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path v-if="task.type === 'pendingDelivery'" d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/>
-                  <path v-else-if="task.type === 'inRent'" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                  <path v-else-if="task.type === 'pendingAcceptance'" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
-                  <path v-else d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
-                </svg>
-                {{ task.typeLabel }}
+                <TaskIcon :type="task.type" :size="14" class-name="task-type-icon" />
+                {{ getTaskTypeLabel(task.type) }}
               </div>
               <div class="task-time">
                 <svg class="time-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -194,7 +101,7 @@
                   <span class="customer-phone">{{ task.customerPhone }}</span>
                 </div>
                 <div class="task-priority" :class="'priority-' + task.priority">
-                  {{ task.priority === 'high' ? '高优先级' : task.priority === 'medium' ? '中优先级' : '低优先级' }}
+                  {{ getPriorityLabel(task.priority) }}
                 </div>
               </div>
               <div class="task-address">
@@ -233,89 +140,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import TaskIcon from './TaskIcon.vue';
+import { useDashboard } from '../composables/useDashboard';
+import { STAT_CARDS, SHORTCUT_ITEMS } from '../constants/taskConfig';
 
 const emit = defineEmits(['navigate', 'viewTask', 'contactCustomer']);
 
-const stats = ref({
-  todayTasks: 0,
-  pendingDelivery: 0,
-  inRent: 0,
-  pendingAcceptance: 0,
-  pendingRepair: 0
-});
+const statCards = STAT_CARDS;
+const shortcutItems = SHORTCUT_ITEMS;
 
-const latestTasks = ref([]);
-
-const newTaskCount = computed(() => {
-  return latestTasks.value.filter(task => task.status === 'new').length;
-});
-
-const shortcutCounts = computed(() => ({
-  all: stats.value.todayTasks || 0,
-  pendingDelivery: stats.value.pendingDelivery || 0,
-  inRent: stats.value.inRent || 0,
-  pendingAcceptance: stats.value.pendingAcceptance || 0,
-  afterSale: stats.value.pendingRepair || 0
-}));
-
-const handleShortcutClick = (type) => {
-  const typeMap = {
-    all: '全部任务',
-    pendingDelivery: '待交付',
-    inRent: '租赁中',
-    pendingAcceptance: '待验收',
-    afterSale: '售后处理'
-  };
-  console.log(`跳转到任务列表：${typeMap[type] || type}`);
-  emit('navigate', { type, label: typeMap[type] });
-};
-
-const handleViewAllTasks = () => {
-  console.log('查看全部任务');
-  emit('navigate', { type: 'all', label: '全部任务' });
-};
-
-const handleViewTaskDetail = (task) => {
-  console.log('查看任务详情:', task.title);
-  emit('viewTask', task);
-};
-
-const handleContactCustomer = (task) => {
-  console.log('联系客户:', task.customerName, task.customerPhone);
-  emit('contactCustomer', task);
-  if (task.customerPhone) {
-    window.location.href = `tel:${task.customerPhone.replace(/\*/g, '0')}`;
-  }
-};
-
-const fetchDashboardStats = async () => {
-  try {
-    const response = await axios.get('/api/dashboard/stats');
-    if (response.data.code === 0) {
-      stats.value = response.data.data;
-    }
-  } catch (error) {
-    console.error('获取看板数据失败:', error);
-  }
-};
-
-const fetchLatestTasks = async () => {
-  try {
-    const response = await axios.get('/api/dashboard/latest-tasks');
-    if (response.data.code === 0) {
-      latestTasks.value = response.data.data;
-    }
-  } catch (error) {
-    console.error('获取最新任务失败:', error);
-  }
-};
-
-onMounted(() => {
-  fetchDashboardStats();
-  fetchLatestTasks();
-});
+const {
+  stats,
+  latestTasks,
+  newTaskCount,
+  shortcutCounts,
+  getTaskTypeLabel,
+  getPriorityLabel,
+  handleShortcutClick,
+  handleViewAllTasks,
+  handleViewTaskDetail,
+  handleContactCustomer
+} = useDashboard(emit);
 </script>
 
 <style scoped>
@@ -390,19 +235,19 @@ onMounted(() => {
   min-width: 0;
 }
 
-.card-purple {
+.card-pendingDelivery {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.card-green {
+.card-inRent {
   background: linear-gradient(135deg, #52c41a 0%, #237804 100%);
 }
 
-.card-orange {
+.card-pendingAcceptance {
   background: linear-gradient(135deg, #fa8c16 0%, #d46b08 100%);
 }
 
-.card-red {
+.card-pendingRepair {
   background: linear-gradient(135deg, #f5222d 0%, #a8071a 100%);
 }
 
@@ -420,11 +265,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.stat-icon {
-  width: 28px;
-  height: 28px;
 }
 
 .stat-content {
@@ -530,19 +370,19 @@ onMounted(() => {
   background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%);
 }
 
-.shortcut-delivery::before {
+.shortcut-pendingDelivery::before {
   background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
 }
 
-.shortcut-rent::before {
+.shortcut-inRent::before {
   background: linear-gradient(180deg, #52c41a 0%, #237804 100%);
 }
 
-.shortcut-acceptance::before {
+.shortcut-pendingAcceptance::before {
   background: linear-gradient(180deg, #fa8c16 0%, #d46b08 100%);
 }
 
-.shortcut-aftersale::before {
+.shortcut-afterSale::before {
   background: linear-gradient(180deg, #f5222d 0%, #a8071a 100%);
 }
 
@@ -556,19 +396,19 @@ onMounted(() => {
   background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
 }
 
-.shortcut-delivery:hover {
+.shortcut-pendingDelivery:hover {
   background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
 }
 
-.shortcut-rent:hover {
+.shortcut-inRent:hover {
   background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
 }
 
-.shortcut-acceptance:hover {
+.shortcut-pendingAcceptance:hover {
   background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
 }
 
-.shortcut-aftersale:hover {
+.shortcut-afterSale:hover {
   background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);
 }
 
@@ -582,34 +422,29 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.icon-blue {
+.icon-all {
   background: rgba(24, 144, 255, 0.12);
   color: #1890ff;
 }
 
-.icon-purple {
+.icon-pendingDelivery {
   background: rgba(102, 126, 234, 0.12);
   color: #667eea;
 }
 
-.icon-green {
+.icon-inRent {
   background: rgba(82, 196, 26, 0.12);
   color: #52c41a;
 }
 
-.icon-orange {
+.icon-pendingAcceptance {
   background: rgba(250, 140, 22, 0.12);
   color: #fa8c16;
 }
 
-.icon-red {
+.icon-afterSale {
   background: rgba(245, 34, 45, 0.12);
   color: #f5222d;
-}
-
-.shortcut-icon {
-  width: 22px;
-  height: 22px;
 }
 
 .shortcut-info {
@@ -671,11 +506,6 @@ onMounted(() => {
   .shortcut-icon-wrapper {
     width: 36px;
     height: 36px;
-  }
-
-  .shortcut-icon {
-    width: 20px;
-    height: 20px;
   }
 }
 
@@ -787,6 +617,10 @@ onMounted(() => {
   background: linear-gradient(180deg, #f5222d 0%, #a8071a 100%);
 }
 
+.task-type-afterSale::before {
+  background: linear-gradient(180deg, #f5222d 0%, #a8071a 100%);
+}
+
 .task-card:hover {
   border-color: transparent;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -825,7 +659,8 @@ onMounted(() => {
   color: #fa8c16;
 }
 
-.task-type-pendingRepair .task-type-tag {
+.task-type-pendingRepair .task-type-tag,
+.task-type-afterSale .task-type-tag {
   background: rgba(245, 34, 45, 0.12);
   color: #f5222d;
 }
