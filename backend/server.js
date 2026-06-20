@@ -7,13 +7,44 @@ const PORT = 8888;
 app.use(cors());
 app.use(express.json());
 
-const employeeData = {
-  id: 'EMP001',
-  name: '张明华',
-  avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20asian%20male%20employee%20portrait%20photo%20business%20suit%20friendly%20smile%20studio%20lighting&image_size=square_hd',
-  city: '上海',
-  deliveryCount: 45
+const EMPLOYEE_ID_PREFIX = 'CGRE';
+const EMPLOYEE_ID_DIGITS = 5;
+let employeeIdCounter = 1;
+
+const generateEmployeeId = () => {
+  const numStr = String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0');
+  const id = `${EMPLOYEE_ID_PREFIX}${numStr}`;
+  employeeIdCounter++;
+  return id;
 };
+
+const employees = [];
+
+const createEmployee = (name, city, avatar = '') => {
+  const id = generateEmployeeId();
+  return {
+    id,
+    name,
+    avatar: avatar || `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20asian%20${name.includes('女') || name.includes('女') || name.endsWith('华') || name.endsWith('兰') || name.endsWith('芳') || name.endsWith('梅') ? 'female' : 'male'}%20employee%20portrait%20photo%20business%20suit%20friendly%20smile%20studio%20lighting&image_size=square_hd`,
+    city,
+    deliveryCount: Math.floor(Math.random() * 80) + 5,
+    joinDate: new Date().toISOString().split('T')[0]
+  };
+};
+
+const initialEmployees = [
+  { name: '张明华', city: '上海' },
+  { name: '李建国', city: '北京' },
+  { name: '王芳', city: '广州' },
+  { name: '陈志强', city: '深圳' },
+  { name: '刘玉兰', city: '成都' }
+];
+
+initialEmployees.forEach(emp => {
+  employees.push(createEmployee(emp.name, emp.city));
+});
+
+const employeeData = employees[0];
 
 const dashboardData = {
   todayTasks: 5,
@@ -110,6 +141,88 @@ app.get('/api/tasks/:id', (req, res) => {
   }
 });
 
+app.get('/api/employees', (req, res) => {
+  const { page = 1, pageSize = 10, keyword = '' } = req.query;
+  let filtered = employees;
+  if (keyword) {
+    filtered = employees.filter(emp => 
+      emp.name.includes(keyword) || emp.id.includes(keyword) || emp.city.includes(keyword)
+    );
+  }
+  const start = (page - 1) * pageSize;
+  const end = start + parseInt(pageSize);
+  const list = filtered.slice(start, end);
+  res.json({
+    code: 0,
+    message: 'success',
+    data: {
+      list,
+      total: filtered.length,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      totalEmployeeCount: employees.length,
+      nextEmployeeId: `${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`
+    }
+  });
+});
+
+app.get('/api/employees/:id', (req, res) => {
+  const empId = req.params.id;
+  const employee = employees.find(emp => emp.id === empId);
+  if (employee) {
+    res.json({
+      code: 0,
+      message: 'success',
+      data: employee
+    });
+  } else {
+    res.json({
+      code: 404,
+      message: '员工不存在',
+      data: null
+    });
+  }
+});
+
+app.post('/api/employees/apply', (req, res) => {
+  const { name, city, avatar = '' } = req.body;
+  if (!name || !city) {
+    return res.json({
+      code: 400,
+      message: '姓名和城市不能为空',
+      data: null
+    });
+  }
+  const newEmployee = createEmployee(name, city, avatar);
+  employees.push(newEmployee);
+  res.json({
+    code: 0,
+    message: '申请成功，员工编号已自动生成',
+    data: {
+      employee: newEmployee,
+      totalEmployeeCount: employees.length,
+      nextEmployeeId: `${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`
+    }
+  });
+});
+
+app.get('/api/employee-id/next', (req, res) => {
+  res.json({
+    code: 0,
+    message: 'success',
+    data: {
+      prefix: EMPLOYEE_ID_PREFIX,
+      digits: EMPLOYEE_ID_DIGITS,
+      currentCounter: employeeIdCounter,
+      nextId: `${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`,
+      totalApplied: employees.length
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Backend server is running on http://localhost:${PORT}`);
+  console.log(`员工编号前缀: ${EMPLOYEE_ID_PREFIX}, 位数: ${EMPLOYEE_ID_DIGITS}`);
+  console.log(`当前下一个编号: ${EMPLOYEE_ID_PREFIX}${String(employeeIdCounter).padStart(EMPLOYEE_ID_DIGITS, '0')}`);
+  console.log(`已注册员工数: ${employees.length}`);
 });

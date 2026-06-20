@@ -34,6 +34,21 @@
           </span>
         </div>
         <div class="info-row">
+          <div class="employee-id-badge">
+            <svg
+              class="id-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM10 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm6 5H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V15zm-2-5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"
+                fill="currentColor"
+              />
+            </svg>
+            <span class="id-label">工号</span>
+            <span class="id-value">{{ employee.id || '--' }}</span>
+          </div>
           <div class="employee-city">
             <svg
               class="location-icon"
@@ -214,6 +229,34 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
+}
+
+.employee-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.id-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.9;
+}
+
+.id-label {
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.id-value {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 .employee-city,
